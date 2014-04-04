@@ -30,8 +30,24 @@ class GroupMeTest < Service::TestCase
     end
   end
 
+  # Assure branch name parsing works with branch hierarchies
+  def test_push_branch_heirarchy
+    svc = service :push, @data
+
+    svc.payload.merge!({'ref' => 'refs/heads/feature/branch_name'})
+
+    @stubs.post "/v3/bots/post" do |env|
+      body = JSON.parse(env[:body])
+      expected = expected_description.gsub!('master', 'feature/branch_name')
+      assert_equal expected, body['text']
+      [200, {}, '']
+    end
+
+    svc.receive_push
+  end
+
   def expected_description
-    'rtomayko pushed 3 commits to grit - http://github.com/mojombo/grit/compare/4c8124f...a47fd41'
+    'rtomayko pushed 3 commits to grit/master - http://github.com/mojombo/grit/compare/4c8124f...a47fd41'
   end
 
   def service(*args)

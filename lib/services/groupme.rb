@@ -7,10 +7,11 @@ class Service::GroupMe < Service
     http.url_prefix = "https://api.groupme.com/v3/bots/"
 
     payload['commits'].size
-    message = "%s pushed %d commits to %s - %s" % [
+    message = "%s pushed %d commits to %s/%s - %s" % [
       payload['pusher']['name'],
       payload['commits'].size,
       payload['repository']['name'],
+      payload['ref'].gsub!('refs/heads/', ''),
       payload['compare']
     ]
 
