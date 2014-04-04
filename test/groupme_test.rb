@@ -22,6 +22,14 @@ class GroupMeTest < Service::TestCase
     svc.receive_push
   end
 
+  def test_push_no_bot_id
+    svc = service :push, @data.except('bot_id')
+
+    assert_raise Service::ConfigurationError do
+      svc.receive_push
+    end
+  end
+
   def expected_description
     'rtomayko pushed 3 commits to grit - http://github.com/mojombo/grit/compare/4c8124f...a47fd41'
   end
