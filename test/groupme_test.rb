@@ -47,7 +47,10 @@ class GroupMeTest < Service::TestCase
   end
 
   def expected_description
-    'rtomayko pushed 3 commits to grit/master - http://git.io/RXtyug'
+    'rtomayko pushed 3 commits to grit/master - http://git.io/RXtyug
+ - stub git call for Grit#heads test f:15 Case#1
+ - clean up heads test f:2hrs
+ - add more comments throughout'
   end
 
   def service(*args)

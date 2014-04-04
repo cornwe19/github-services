@@ -15,7 +15,16 @@ class Service::GroupMe < Service
       shorten_url( payload['compare'] )
     ]
 
+    commits = payload['commits']
+    for i in 0...commits.size
+      message += '%s - %s' % [newline, commits[i]['message']]
+    end
+
     http_post "post", { "bot_id" => data['bot_id'], "text" => message }.to_json
+  end
+
+  def newline
+    [0x0A].pack('c*')
   end
 
 end
