@@ -10,6 +10,8 @@ class GroupMeTest < Service::TestCase
   def test_push
     svc = service :push, @data
 
+    stub_payload svc.payload
+
     @stubs.post "/v3/bots/post" do |env|
       assert_equal 'api.groupme.com', env[:url].host
 
@@ -25,6 +27,8 @@ class GroupMeTest < Service::TestCase
   # Limit commit summary to 3 messages
   def test_push_4_commits
     svc = service :push, @data
+
+    stub_payload svc.payload
 
     svc.payload['commits'].push({'message' => 'one more commit'})
 
@@ -49,7 +53,9 @@ class GroupMeTest < Service::TestCase
   def test_push_branch_heirarchy
     svc = service :push, @data
 
-    svc.payload.merge!({'ref' => 'refs/heads/feature/branch_name'})
+    stub_payload svc.payload
+
+    svc.payload['ref'] = 'refs/heads/feature/branch_name'
 
     @stubs.post "/v3/bots/post" do |env|
       body = JSON.parse(env[:body])
@@ -60,11 +66,22 @@ class GroupMeTest < Service::TestCase
     svc.receive_push
   end
 
-  def expected_description(commits: 3, branch: 'master')
-    'rtomayko pushed %d commits to grit/%s - http://git.io/RXtyug
- - stub git call for Grit#heads test f:15 Case#1
- - clean up heads test f:2hrs
- - add more comments throughout' % [ commits, branch ]
+  def expected_description(commits: 3, branch: 'master', first_commit: 'first')
+    'user pushed %d commits to repo/%s - http://git.io/hash
+ - %s
+ - second
+ - third' % [ commits, branch, first_commit ]
+  end
+
+  def stub_payload payload
+    payload['commits'] = [
+      {'message' => 'first'},
+      {'message' => 'second'},
+      {'message' => 'third'}
+    ]
+    payload['ref'] = 'refs/heads/master'
+    payload['repository'] = {'name' => 'repo'}
+    payload['pusher'] = {'name' => 'user'}
   end
 
   def service(*args)
@@ -72,7 +89,7 @@ class GroupMeTest < Service::TestCase
 
       class << svc
         def shorten_url(*args)
-          'http://git.io/RXtyug'
+          'http://git.io/hash'
         end
       end
 
