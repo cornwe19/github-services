@@ -47,10 +47,18 @@ class GroupMeTest < Service::TestCase
   end
 
   def expected_description
-    'rtomayko pushed 3 commits to grit/master - http://github.com/mojombo/grit/compare/4c8124f...a47fd41'
+    'rtomayko pushed 3 commits to grit/master - http://git.io/RXtyug'
   end
 
   def service(*args)
-      super Service::GroupMe, *args
+      svc = super(Service::GroupMe, *args)
+
+      class << svc
+        def shorten_url(*args)
+          'http://git.io/RXtyug'
+        end
+      end
+
+      svc
   end
 end

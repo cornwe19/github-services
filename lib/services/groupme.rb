@@ -12,7 +12,7 @@ class Service::GroupMe < Service
       payload['commits'].size,
       payload['repository']['name'],
       payload['ref'].gsub!('refs/heads/', ''),
-      payload['compare']
+      shorten_url( payload['compare'] )
     ]
 
     http_post "post", { "bot_id" => data['bot_id'], "text" => message }.to_json
