@@ -17,10 +17,18 @@ class Service::GroupMe < Service
 
     commits = payload['commits']
     for i in 0...[3,commits.size].min
-      message += '%s - %s' % [newline, commits[i]['message']]
+      message += '%s - %s' % [newline, truncate(commits[i]['message'])]
     end
 
     http_post "post", { "bot_id" => data['bot_id'], "text" => message }.to_json
+  end
+
+  def truncate msg
+    if msg.size > 50
+      msg[0...47] + "..."
+    else
+      msg
+    end
   end
 
   def newline

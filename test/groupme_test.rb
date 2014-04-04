@@ -41,6 +41,22 @@ class GroupMeTest < Service::TestCase
     svc.receive_push
   end
 
+  def test_push_long_message
+    svc = service :push, @data
+
+    stub_payload svc.payload
+
+    svc.payload['commits'].first['message'] = "Something longer than 50 characters should get truncated"
+
+    @stubs.post "/v3/bots/post" do |env|
+      body = JSON.parse(env[:body])
+      assert_equal expected_description(first_commit: 'Something longer than 50 characters should get ...'), body['text']
+      [200, {}, '']
+    end
+
+    svc.receive_push
+  end
+
   def test_push_no_bot_id
     svc = service :push, @data.except('bot_id')
 
