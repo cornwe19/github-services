@@ -1,6 +1,11 @@
 class Service::GroupMe < Service
   string :bot_id
 
+  maintained_by :github => 'cornwe19'
+  supported_by :web => 'http://help.groupme.com/home'
+
+  default_events :push
+
   def receive_push
     raise_config_error "Requires a bot id" if data['bot_id'].to_s.empty?
 
