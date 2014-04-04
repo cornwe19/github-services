@@ -16,7 +16,7 @@ class Service::GroupMe < Service
     ]
 
     commits = payload['commits']
-    for i in 0...commits.size
+    for i in 0...[3,commits.size].min
       message += '%s - %s' % [newline, commits[i]['message']]
     end
 

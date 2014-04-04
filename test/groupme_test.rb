@@ -22,6 +22,21 @@ class GroupMeTest < Service::TestCase
     svc.receive_push
   end
 
+  # Limit commit summary to 3 messages
+  def test_push_4_commits
+    svc = service :push, @data
+
+    svc.payload['commits'].push({'message' => 'one more commit'})
+
+    @stubs.post "/v3/bots/post" do |env|
+      body = JSON.parse(env[:body])
+      assert_equal expected_description(commits: 4), body['text']
+      [200, {}, '']
+    end
+
+    svc.receive_push
+  end
+
   def test_push_no_bot_id
     svc = service :push, @data.except('bot_id')
 
@@ -38,19 +53,18 @@ class GroupMeTest < Service::TestCase
 
     @stubs.post "/v3/bots/post" do |env|
       body = JSON.parse(env[:body])
-      expected = expected_description.gsub!('master', 'feature/branch_name')
-      assert_equal expected, body['text']
+      assert_equal expected_description(branch: 'feature/branch_name'), body['text']
       [200, {}, '']
     end
 
     svc.receive_push
   end
 
-  def expected_description
-    'rtomayko pushed 3 commits to grit/master - http://git.io/RXtyug
+  def expected_description(commits: 3, branch: 'master')
+    'rtomayko pushed %d commits to grit/%s - http://git.io/RXtyug
  - stub git call for Grit#heads test f:15 Case#1
  - clean up heads test f:2hrs
- - add more comments throughout'
+ - add more comments throughout' % [ commits, branch ]
   end
 
   def service(*args)
