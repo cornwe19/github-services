@@ -1,0 +1,7 @@
+Install Notes
+-------------
+
+  1. GroupMe bots may be created via the bot creation form (https://dev.groupme.com/bots/new)
+
+  2. Bot Id refers to the token generated once a bot has been created for your
+     GroupMe group. See https://dev.groupme.com/tutorials/bots for more information.
